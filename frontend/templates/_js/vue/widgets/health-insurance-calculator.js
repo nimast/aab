@@ -16,14 +16,13 @@
 {% include "_js/vue/components/income-input.js" %}
 {% include "_js/vue/components/radio.js" %}
 {% include "_js/vue/components/tabs.js" %}
-{% include "_js/vue/mixins/brokerMixin.js" %}
 {% include "_js/vue/mixins/multiStageMixin.js" %}
 {% include "_js/vue/mixins/trackedStagesMixin.js" %}
 {% include "_js/vue/mixins/uniqueIdsMixin.js" %}
 
 {% js %}{% raw %}
 Vue.component('health-insurance-calculator', {
-	mixins: [brokerMixin, multiStageMixin, uniqueIdsMixin, trackedStagesMixin],
+	mixins: [multiStageMixin, uniqueIdsMixin, trackedStagesMixin],
 	props: {
 		static: {
 			type: Boolean,
@@ -54,6 +53,7 @@ Vue.component('health-insurance-calculator', {
 			hasEUPublicHealthInsurance: null,
 
 			// Contact form
+			brokerPhoneNumber: '+49 162 6969454',
 			contactMethod: null,
 			fullName: '',
 			email: '',
@@ -204,14 +204,16 @@ Vue.component('health-insurance-calculator', {
 			}[this.intent] || 'choose the best health insurance'
 		},
 		whatsappMessage(){
-			return `Hi ${this.broker.name}, I am ${this.fullName}. Can you help me ${this.intentString}? ${this.personSummary}`;
+			return `Hi Seamus, I am ${this.fullName}. Can you help me ${this.intentString}? ${this.personSummary}`;
 		},
 		whatsappUrl(){
-			return `https://wa.me/${this.broker.phoneNumber}?text=${encodeURIComponent(this.whatsappMessage)}`;
+			const phoneNumber = this.brokerPhoneNumber.replaceAll(' ', '');
+			return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(this.whatsappMessage)}`;
 		},
 		qrCode(){
+			const phoneNumber = this.brokerPhoneNumber.replaceAll(' ', '');
 			var qrcode = new QRCode({
-				content: `https://wa.me/${this.broker.phoneNumber}`,
+				content: `https://wa.me/${phoneNumber}`,
 				width: 150,
 				height: 150,
 				padding: 0,
@@ -231,7 +233,7 @@ Vue.component('health-insurance-calculator', {
 
 		trackedStagesExtraData() {
 			const data = {
-				partner: this.broker.id,
+				partner: 'seamus-wolf',
 			};
 			if(this.contactMethod){
 				data.contactMethod = this.contactMethod;
@@ -328,7 +330,7 @@ Vue.component('health-insurance-calculator', {
 
 							referrer: getReferrer() || '',
 							contact_method: this.contactMethod || 'EMAIL',
-							broker: this.broker.id,
+							broker: 'seamus-wolf',
 						}),
 					},
 				);
@@ -479,7 +481,7 @@ Vue.component('health-insurance-calculator', {
 
 			<template v-if="stage === 'questions'">
 				<h2>Tell us a bit more about you&hellip;</h2>
-				<p v-if="mode === 'question'">You can skip this step, but this information helps {{ broker.name }} recommend the right health insurance.</p>
+				<p v-if="mode === 'question'">You can skip this step, but this information helps Seamus recommend the right health insurance.</p>
 				<p v-else>It helps us calculate prices and recommend the right health insurance.</p>
 				<hr>
 				<div class="form-group">
@@ -591,12 +593,12 @@ Vue.component('health-insurance-calculator', {
 							<i class="icon left" aria-hidden="true"></i> <span :class="{'no-mobile': !!contactMethod}">Go back</span>
 						</button>
 						<button v-if="contactMethod === 'EMAIL'" class="button primary" @click="createCase" :disabled="isLoading" :class="{loading: isLoading}">
-							Ask {{ broker.name }}
+							Ask Seamus
 						</button>
 						<a v-if="contactMethod === 'WHATSAPP'" :href="whatsappUrl" @click="createCase" class="button whatsapp" :disabled="isLoading" target="_blank">
 							{% endraw %}{% include "_icons/whatsapp.svg" %}{% raw %}
 							<span class="only-mobile">Start chat</span>
-							<span class="no-mobile">Chat with {{ broker.name }}</span>
+							<span class="no-mobile">Chat with Seamus</span>
 						</a>
 					</template>
 				</div>
@@ -616,7 +618,7 @@ Vue.component('health-insurance-calculator', {
 							{% endraw %}{% include "_icons/help.svg" %}{% raw %}
 							<div>
 								<h3 :id="uid('h-askOurExpert')">Ask our expert</h3>
-								<p>Let {{ broker.name }} find the best health insurance for you. It's 100% free.</p>
+								<p>Let Seamus find the best health insurance for you. It's 100% free.</p>
 							</div>
 						</button>
 					</li>
@@ -645,12 +647,12 @@ Vue.component('health-insurance-calculator', {
 				<div class="form-recipient">
 					<div>
 						<p v-if="occupation === 'other'">If your situation is complicated, let our expert help you.</p>
-						<p>{{ broker.name }} will help you <strong v-text="intentString">choose the best health insurance</strong>. I work with {{ broker.him }} because {{ broker.he }} is honest and knowledgeable.</p>
-						<p>{{ capitalize(broker.he) }} replies on the same day. {{ capitalize(broker.his) }} help is <strong>100% free</strong>.</p>
+						<p>Seamus will help you <strong v-text="intentString">choose the best health insurance</strong>. I work with him because he is honest and knowledgeable.</p>
+						<p>He replies on the same day. His help is <strong>100% free</strong>.</p>
 					</div>
 					<img
-						:srcset="'/experts/photos/bioLarge1x/' + broker.id + '.jpg, /experts/photos/bioLarge2x/' + broker.id + '.jpg 2x'"
-						:alt="broker.fullName" width="125" height="125"
+						:srcset="'/experts/photos/bioLarge1x/seamus-wolf.jpg, /experts/photos/bioLarge2x/seamus-wolf.jpg 2x'"
+						alt="Seamus Wolf" width="125" height="125"
 						sizes="125px">
 				</div>
 				<hr>
@@ -688,7 +690,7 @@ Vue.component('health-insurance-calculator', {
 							<label :for="uid('question')">
 								Your question
 							</label>
-							<textarea :id="uid('question')" v-model="question" :placeholder="'How can ' + broker.name + ' help you?'" :required="occupation === 'other'"></textarea>
+							<textarea :id="uid('question')" v-model="question" placeholder="How can Seamus help you?" :required="occupation === 'other'"></textarea>
 						</div>
 					</template>
 				</template>
@@ -702,12 +704,12 @@ Vue.component('health-insurance-calculator', {
 							Continue <i class="icon right" aria-hidden="true"></i>
 						</button>
 						<button v-if="mode === 'calculator' && contactMethod === 'EMAIL'" class="button primary" @click="createCase" :disabled="isLoading" :class="{loading: isLoading}">
-							Ask {{ broker.name }}
+							Ask Seamus
 						</button>
 						<a v-if="mode === 'calculator' && contactMethod === 'WHATSAPP'" :href="whatsappUrl" @click="createCase" class="button whatsapp" :disabled="isLoading" target="_blank">
 							{% endraw %}{% include "_icons/whatsapp.svg" %}{% raw %}
 							<span class="only-mobile">Start chat</span>
-							<span class="no-mobile">Chat with {{ broker.name }}</span>
+							<span class="no-mobile">Chat with Seamus</span>
 						</a>
 					</div>
 				</template>
@@ -717,10 +719,10 @@ Vue.component('health-insurance-calculator', {
 				<div class="form-recipient">
 					<div>
 						<p>
-							To chat with {{ broker.name }}, <a :href="whatsappUrl" target="_blank">open WhatsApp</a> <span class="no-mobile">or scan this QR code</span>.
+							To chat with Seamus, <a :href="whatsappUrl" target="_blank">open WhatsApp</a> <span class="no-mobile">or scan this QR code</span>.
 						</p>
 						<p>
-							{{ capitalize(broker.his) }} number is <strong class="selectable">{{ broker.phoneNumberPretty }}</strong>.
+							His number is <strong class="selectable" v-text="brokerPhoneNumber"></strong>.
 						</p>
 					</div>
 					<svg class="no-mobile" v-html="qrCode" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 150 150"></svg>
@@ -738,7 +740,7 @@ Vue.component('health-insurance-calculator', {
 			</template>
 
 			<template v-if="stage === 'thank-you' && contactMethod === 'EMAIL'">
-				<p><strong>Thank you!</strong> {{ broker.name }} got your message. {{ capitalize(broker.he) }} will answer your question in the next 24 hours.</p>
+				<p><strong>Thank you!</strong> Seamus got your message. He will answer your question in the next 24 hours.</p>
 				<hr>
 				<div class="buttons bar">
 					<button aria-label="Go back" class="button" @click="goToStart()">
